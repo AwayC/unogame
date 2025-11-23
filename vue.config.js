@@ -1,0 +1,16 @@
+module.exports = {
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8081',
+        ws: false,
+        changeOrigin: true,
+      },
+      '/ws': {
+        target: 'http://localhost:8081',
+        ws: true,
+        changeOrigin: true,
+      },
+    },
+  }
+}
