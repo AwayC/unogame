@@ -1,9 +1,17 @@
 export default {
   install (Vue, options) {
     Vue.prototype.$c2s = function (funcname, ...args) {
-      this.$socket.emit('c2s', funcname, ...args)
+      // 修改：使用原生 WebSocket 发送 JSON 字符串
+      // 协议格式假设为数组: ["函数名", 参数1, 参数2...]
+      if (this.$socket && this.$socket.readyState === 1) { // 1 = OPEN
+        this.$socket.send(JSON.stringify([funcname, ...args]))
+      } else {
+        console.warn('WebSocket 未连接，无法发送消息:', funcname)
+      }
     }
+
     Vue.prototype.$s2cHandler = function (args) {
+      // 保持原有逻辑不变，args 依然是数组 [funcname, ...params]
       let func = this[typeof args === 'string' ? args : args[0]]
       if (!func) {
         return

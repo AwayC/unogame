@@ -95,7 +95,7 @@ export default {
       this.state = STATE_LOGGED
 
       // 如果身上还有room_id，则请求加入房间
-      if (this.data.room_id) {
+      if (this.data.room_id && this.data.room_id > 0) {
         this.$c2s('enter_room_req', this.data.room_id, true)
         this.state = STATE_REENTERING_ROOM
       }
