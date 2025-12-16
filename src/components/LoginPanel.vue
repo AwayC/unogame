@@ -60,6 +60,8 @@ export default {
               this.$message.error(`登录失败（Code: ${data.code}, Msg: ${data.msg}）`)
             }
           } else {
+            // 【新增】保存登录状态到本地存储
+            this.saveLoginState(data.data.token, this.username)
             this.$emit('login', data.data.token)
           }
 
@@ -132,6 +134,8 @@ export default {
             return
           }
 
+          // 【新增】注册成功也保存状态
+          this.saveLoginState(data.data.token, this.username)
           this.$emit('login', data.data.token)
 
           this.password = ''
@@ -145,12 +149,17 @@ export default {
           this.$message.error(err)
         })
       this.disabled = true
+    },
+
+    // 【新增】封装保存逻辑
+    saveLoginState (token, username) {
+      localStorage.setItem('uno_token', token)
+      localStorage.setItem('uno_username', username)
     }
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   .panel {
     position: absolute;

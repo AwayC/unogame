@@ -114,7 +114,8 @@ Vue.use(VueResize)
 // 根据环境决定 URL
 let wsUrl = ''
 if (process.env.NODE_ENV === 'production') {
-  wsUrl = 'ws://uno.example.com/ws' // 生产环境地址
+  // wsUrl = 'ws://uno.example.com/ws' // 生产环境地址
+  wsUrl = `ws://${location.hostname}:8081/ws`
 } else {
   // 开发环境走代理:8080 -> :8081
   // 注意：WebSocket 协议头是 ws://
@@ -122,6 +123,15 @@ if (process.env.NODE_ENV === 'production') {
 }
 wsService.init(wsUrl)
 
+// 【新增】读取本地存储的 Token
+const savedToken = localStorage.getItem('uno_token')
+const savedUser = localStorage.getItem('uno_username')
+
 new Vue({
+  // 【新增】将保存的数据放入根实例的 data 中
+  data: {
+    savedToken: savedToken,
+    savedUser: savedUser
+  },
   render: h => h(App)
 }).$mount('#app')

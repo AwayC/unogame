@@ -4,7 +4,7 @@
       <div class="gameover-panel">
         <div class="winner-content">
           恭喜
-          <img class="winner-avatar" :src="getAvatarImgUrl(gameOverWindowWinnerEmail)" />
+          <img class="winner-avatar" :src="getGameOverAvatarImgUrl(gameOverWindowWinnerEmail)" />
           <span class="winner-nickname">{{ gameOverWindowWinnerNick }}</span>
           逃出生天！
         </div>
@@ -330,10 +330,33 @@ export default {
       }
       return this.room.seq[this.room.cursor] === uid
     },
-    getAvatarImgUrl (email) {
+
+    // --- START AVATAR MODIFICATIONS ---
+
+    // 负责计算 Gravatar URL，接受 vmin 作为参数
+    getGravatarUrlBySize (email, sizeVmin) {
+      email = email || ''
       email = email.trim().toLowerCase()
-      return `https://www.gravatar.com/avatar/${md5(email)}?s=${Math.ceil(vmin(8))}`
+
+      if (!sizeVmin || sizeVmin <= 0) {
+        sizeVmin = 12 // 默认使用最大的玩家卡片头像尺寸 12vmin
+      }
+
+      const targetPixelSize = Math.ceil(vmin(sizeVmin * 2))
+
+      return `https://www.gravatar.com/avatar/${md5(email)}?s=${targetPixelSize}&d=mp`
     },
+
+    getAvatarImgUrl (email) {
+      return this.getGravatarUrlBySize(email, 12)
+    },
+
+    getGameOverAvatarImgUrl (email) {
+      return this.getGravatarUrlBySize(email, 6)
+    },
+
+    // --- END AVATAR MODIFICATIONS ---
+
     genGameOverStat (stat) {
       let text = events.GAME_FINAL_STAT_EVENT_TABLE[stat.id]
       if (!text) {
@@ -868,7 +891,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
   .landscape-layout {
     width: 100%;

@@ -33,7 +33,8 @@ export default {
 
       // 客户端状态
       token: '', // Token
-      data: { uid: -1 } // 客户端状态
+      data: { uid: -1 }, // 客户端状态
+      username: ''
     }
   },
   components: {
@@ -42,6 +43,15 @@ export default {
     CreateRolePanel,
     LobbyPanel,
     RoomPanel
+  },
+  // 【修改点 1】添加 created 钩子，页面刷新时恢复 Token
+  created () {
+    const savedToken = localStorage.getItem('uno_token')
+    if (savedToken) {
+      console.log('App created: Found saved token, restoring...')
+      this.token = savedToken
+      // 注意：此时 Socket 可能还没连上，逻辑会交给 sockets.connect 处理
+    }
   },
   methods: {
     reset () { // 重置系统状态
@@ -55,12 +65,18 @@ export default {
       this.token = token
       this.state = STATE_LOGINING
 
+      // 【修改点 2】确保 Token 被保存 (防止 LoginPanel 没存)
+      localStorage.setItem('uno_token', token)
+
       console.log(`Emit login reqeust`)
       this.$c2s('login_req', this.token)
     },
     onLogout () {
       console.log(`Logout`)
+      // 【修改点 3】主动退出，清除 Token 并刷新页面
+      localStorage.removeItem('uno_token')
       this.$c2s('logout_req')
+      location.reload()
     },
 
     // 服务器事件
@@ -83,6 +99,10 @@ export default {
         // 登录失败，此时需要清空Token，然后重新发起登录
         this.$message.error(`登录失败（Code: ${code}）`)
         this.token = ''
+
+        // 【修改点 4】登录失败（可能是 Token 过期），清除本地非法 Token
+        localStorage.removeItem('uno_token')
+
         this.reset()
         return
       }
@@ -91,6 +111,10 @@ export default {
       console.log(`Login successfully`)
       // console.log(data)
       this.token = token // 刷新Token
+
+      // 【修改点 5】登录成功，更新本地 Token (服务器可能返回更新的 Token)
+      localStorage.setItem('uno_token', token)
+
       this.data = data
       this.state = STATE_LOGGED
 
@@ -107,6 +131,9 @@ export default {
       this.token = ''
       this.data = {}
       this.state = STATE_NOT_LOGGED
+
+      // 【修改点 6】被踢出时，也要清除本地 Token，防止刷新后死循环自动登录
+      localStorage.removeItem('uno_token')
 
       if (reason === 'kick-out') {
         this.$message.error('您被服务器踢出，可能是发生了顶号等情况')
@@ -159,6 +186,7 @@ export default {
       if (this.token === '') {
         this.state = STATE_NOT_LOGGED
       } else {
+        // 【关键逻辑】如果 created 里恢复了 token，这里会自动进入登录流程
         this.state = STATE_LOGINING
         this.onLogin(this.token)
       }
