@@ -891,6 +891,8 @@ export default {
 }
 </script>
 
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
   .landscape-layout {
     width: 100%;
@@ -1163,8 +1165,9 @@ export default {
   .uno-card {
     position: absolute;
     cursor: pointer;
-    top: 0.5vmin;
+    top: 2vmin;
     bottom: 0.5vmin;
+    transition: transform 0.2s ease-in-out;
   }
   .uno-card .uno-card-img {
     height: 100%;
@@ -1181,13 +1184,19 @@ export default {
     filter: grayscale(40%);
   }
   .uno-card:hover>img {
-    filter: grayscale(0%) brightness(120%);
+    filter: grayscale(0%) brightness(100%);
   }
   .uno-card.selected>img {
-    filter: grayscale(0%) brightness(200%) blur(0.01vmin);
+    filter: grayscale(0%) brightness(120%) blur(0.01vmin);
   }
   .uno-card.forbidden {
     cursor: not-allowed !important;
+  }
+  .uno-card:hover {
+    transform: translateY(-2vmin);
+  }
+  .uno-card.selected {
+    transform: translateY(-2vmin);
   }
 
   .voice-list {
