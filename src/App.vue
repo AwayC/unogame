@@ -11,6 +11,7 @@
 <script>
 import assert from 'assert'
 import errc from './comm/errc'
+import sounds from './comm/sounds'
 import LoadingIcon from './components/LoadingIcon.vue'
 import LoginPanel from './components/LoginPanel.vue'
 import CreateRolePanel from './components/CreateRolePanel.vue'
@@ -62,6 +63,7 @@ export default {
     // UI事件
     onLogin (token) {
       console.log(`Login, token ${token}`)
+      sounds.init()
       this.token = token
       this.state = STATE_LOGINING
 
