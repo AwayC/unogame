@@ -115,7 +115,11 @@ Vue.use(VueResize)
 let wsUrl = ''
 if (process.env.NODE_ENV === 'production') {
   // wsUrl = 'ws://uno.example.com/ws' // 生产环境地址
-  wsUrl = `ws://${location.hostname}:8081/ws`
+  const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
+  // 2. 自动获取端口：
+  const port = location.port ? `:${location.port}` : ''
+
+  wsUrl = `${protocol}://${location.hostname}${port}/ws`
 } else {
   // 开发环境走代理:8080 -> :8081
   // 注意：WebSocket 协议头是 ws://

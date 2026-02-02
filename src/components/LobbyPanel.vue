@@ -55,12 +55,13 @@
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="onUpdateAccountInfo" v-if="accountInfoWindowEmailInput | accountInfoWindowPasswordInput" :disabled="accountInfoWindowDisabled">更新资料</el-button>
         <el-button @click="onCloseAccountInfoWindow" :disabled="accountInfoWindowDisabled">关闭</el-button>
+        <el-button type="danger" @click="onLogout" :disabled="accountInfoWindowDisabled">退出登录</el-button>
       </span>
     </el-dialog>
 
     <div class="layout-top">
-      <span class="top-icon el-icon-circle-plus-outline" @click="onShowCreateRoom"></span>
-      <span class="top-icon float-right el-icon-s-custom" @click="onShowAccountInfo"></span>
+      <span class="top-icon el-icon-circle-plus-outline" @click="onShowCreateRoom" title="创建房间"></span>
+      <span class="top-icon float-right el-icon-s-custom" @click="onShowAccountInfo" title="个人资料"></span>
     </div>
     <div class="layout-content">
       <el-card class="box-card" v-for="e in rooms" v-bind:key="e.id">
@@ -110,6 +111,18 @@ export default {
     }
   },
   methods: {
+    // 退出登录方法
+    onLogout () {
+      this.$confirm('确定要退出登录吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$emit('logout')
+      }).catch(() => {
+        // 取消
+      })
+    },
     releaseAccountInfoReqs () {
       this.accountInfoReqs = this.accountInfoReqs - 1
       if (this.accountInfoReqs <= 0) {
@@ -306,7 +319,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   .landscape-layout {
     width: 100%;
